@@ -42,7 +42,7 @@ jobs:
           labels: develop
 # DockerHub
       - name: Docker meta
-        id: meta
+        id: meta_dhub
         uses: docker/metadata-action@v4
         with:
           images: raguchan/misskey
