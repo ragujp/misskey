@@ -12,7 +12,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Add Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Add qemu 
+        uses: docker/setup-qemu-action@v2
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
@@ -28,8 +33,8 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          platforms: linux/amd64,linux/arm64/v8
+          platforms: linux/amd64,linux/arm64
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/misskey:latest
+          tags: ghcr.io/${{ github.repository_owner }}/misskey:develop
           labels: develop
