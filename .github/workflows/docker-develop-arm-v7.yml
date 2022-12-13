@@ -1,4 +1,4 @@
-name: Publish Docker image (develop)(other platforms)
+name: Publish Docker image (develop)(arm/v7)
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          platforms: linux/arm/v7,linux/arm64/v8,linux/ppc64le
+          platforms: linux/arm/v7
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/misskey:develop
