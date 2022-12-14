@@ -11,8 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: docker/setup-buildx-action@v2
-      - uses: docker/setup-qemu-action@v2
+      - name: Add Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Add qemu 
+        uses: docker/setup-qemu-action@v2
       - name: Check out the repo
         uses: actions/checkout@v3
       - name: Docker meta
@@ -41,3 +43,30 @@ jobs:
           push: true
           tags: ghcr.io/${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+      - name: DockerHub meta
+        id: meta_dhub
+        uses: docker/metadata-action@v4
+        with:
+          images: raguchan/misskey
+          tags: |
+            type=edge
+            type=ref,event=pr
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and Push to Docker Hub
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: ${{ steps.meta_dhub.outputs.tags }}
+          labels: ${{ steps.meta_dhub.outputs.labels }}
