@@ -60,4 +60,4 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: ${{ github.repository_owner }}/misskey:latest
-          labels: ${{ steps.meta.outputs.labels }}
+          labels: ${{ steps.meta_dhub.outputs.labels }}
