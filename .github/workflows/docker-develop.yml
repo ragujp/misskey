@@ -29,7 +29,6 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          platforms: linux/arm64
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           cache-from: type=gha
@@ -51,7 +50,6 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          platforms: linux/arm64
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
