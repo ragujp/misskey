@@ -54,21 +54,21 @@ export class ApiCallService implements OnApplicationShutdown {
 	@bindThis
 	public handleRequest(
 		endpoint: IEndpoint & { exec: any },
-		request: FastifyRequest<{ Body: Record<string, unknown>, Querystring: Record<string, unknown> }>,
+		request: FastifyRequest<{ Body: Record<string, unknown> | undefined, Querystring: Record<string, unknown> }>,
 		reply: FastifyReply,
 	) {
 		const body = request.method === 'GET'
 			? request.query
 			: request.body;
 
-		const token = body['i'];
+		const token = body?.['i'];
 		if (token != null && typeof token !== 'string') {
 			reply.code(400);
 			return;
 		}
 		this.authenticateService.authenticate(token).then(([user, app]) => {
 			this.call(endpoint, user, app, body, null, request).then((res) => {
-				if (request.method === 'GET' && endpoint.meta.cacheSec && !body['i'] && !user) {
+				if (request.method === 'GET' && endpoint.meta.cacheSec && !body?.['i'] && !user) {
 					reply.header('Cache-Control', `public, max-age=${endpoint.meta.cacheSec}`);
 				}
 				this.send(reply, res);
@@ -111,7 +111,7 @@ export class ApiCallService implements OnApplicationShutdown {
 		for (const [k, v] of Object.entries(multipartData.fields)) {
 			fields[k] = v.value;
 		}
-	
+
 		const token = fields['i'];
 		if (token != null && typeof token !== 'string') {
 			reply.code(400);
@@ -199,7 +199,7 @@ export class ApiCallService implements OnApplicationShutdown {
 			name: string;
 			path: string;
 		} | null,
-		request: FastifyRequest<{ Body: Record<string, unknown>, Querystring: Record<string, unknown> }>,
+		request: FastifyRequest<{ Body: Record<string, unknown> | undefined, Querystring: Record<string, unknown> }>,
 	) {
 		const isSecure = user != null && token == null;
 		const isModerator = user != null && (user.isModerator || user.isAdmin);
@@ -290,7 +290,6 @@ export class ApiCallService implements OnApplicationShutdown {
 		}
 
 		// API invoking
-		const before = performance.now();
 		return await ep.exec(data, user, token, file, request.ip, request.headers).catch((err: Error) => {
 			if (err instanceof ApiError) {
 				throw err;
@@ -312,12 +311,6 @@ export class ApiCallService implements OnApplicationShutdown {
 						stack: err.stack,
 					},
 				});
-			}
-		}).finally(() => {
-			const after = performance.now();
-			const time = after - before;
-			if (time > 1000) {
-				this.logger.warn(`SLOW API CALL DETECTED: ${ep.name} (${time}ms)`);
 			}
 		});
 	}

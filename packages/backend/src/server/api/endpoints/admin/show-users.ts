@@ -3,6 +3,7 @@ import type { UsersRepository } from '@/models/index.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
 import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
+import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
 
 export const meta = {
 	tags: ['admin'],
@@ -26,7 +27,7 @@ export const paramDef = {
 	properties: {
 		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
 		offset: { type: 'integer', default: 0 },
-		sort: { type: 'string', enum: ['+follower', '-follower', '+createdAt', '-createdAt', '+updatedAt', '-updatedAt'] },
+		sort: { type: 'string', enum: ['+follower', '-follower', '+createdAt', '-createdAt', '+updatedAt', '-updatedAt', '+lastActiveDate', '-lastActiveDate'] },
 		state: { type: 'string', enum: ['all', 'alive', 'available', 'admin', 'moderator', 'adminOrModerator', 'silenced', 'suspended'], default: 'all' },
 		origin: { type: 'string', enum: ['combined', 'local', 'remote'], default: 'combined' },
 		username: { type: 'string', nullable: true, default: null },
@@ -68,7 +69,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 			}
 
 			if (ps.username) {
-				query.andWhere('user.usernameLower like :username', { username: ps.username.toLowerCase() + '%' });
+				query.andWhere('user.usernameLower like :username', { username: sqlLikeEscape(ps.username.toLowerCase()) + '%' });
 			}
 
 			if (ps.hostname) {
@@ -82,6 +83,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 				case '-createdAt': query.orderBy('user.createdAt', 'ASC'); break;
 				case '+updatedAt': query.orderBy('user.updatedAt', 'DESC', 'NULLS LAST'); break;
 				case '-updatedAt': query.orderBy('user.updatedAt', 'ASC', 'NULLS FIRST'); break;
+				case '+lastActiveDate': query.orderBy('user.lastActiveDate', 'DESC', 'NULLS LAST'); break;
+				case '-lastActiveDate': query.orderBy('user.lastActiveDate', 'ASC', 'NULLS FIRST'); break;
 				default: query.orderBy('user.id', 'ASC'); break;
 			}
 
