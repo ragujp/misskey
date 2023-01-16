@@ -16,7 +16,7 @@ jobs:
       - name: Add qemu 
         uses: docker/setup-qemu-action@v2
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.3.0
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4

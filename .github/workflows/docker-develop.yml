@@ -10,14 +10,14 @@ jobs:
   push_to_registry:
     name: Push Docker image to GitHub Container Registry
     runs-on: ubuntu-latest
-
+    if: github.repository == 'misskey-dev/misskey'
     steps:
       - name: Add Buildx
         uses: docker/setup-buildx-action@v2
       - name: Add qemu 
         uses: docker/setup-qemu-action@v2
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Check out the repo
+        uses: actions/checkout@v3.3.0
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
