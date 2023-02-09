@@ -59,7 +59,7 @@ jobs:
      - run:
         name: "Push manifest"
         command: |
-        docker manifest push ragujp/misskey:latest
+          docker manifest push ragujp/misskey:latest
 workflows:
   version: 2
   build_and_deploy:
