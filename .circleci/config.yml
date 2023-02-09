@@ -27,7 +27,7 @@ commands:
           command: |
             if [ "$GITHUB_USERNAME$GITHUB_TOKEN" ]
              then
-             apk update && apk add jq
+             apt-get update && apt-get install jq
              echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_USERNAME --password-stdin
              docker build -t ghcr.io/$GITHUB_USER/misskey:latest .
              docker tag ghcr.io/$GITHUB_USERNAME/misskey ghcr.io/$GITHUB_USERNAME/misskey:<< parameters.arch >>-${CIRCLE_SHA1}
