@@ -49,7 +49,6 @@ jobs:
        auth:
        username: ragujp
        password: $GITHUB_TOKEN
-    executor: amd64
      - docker/check
      - run:
         name: "Create manifest"
