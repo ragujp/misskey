@@ -1,0 +1,8 @@
+jobs:
+  my-test-job:
+    machine:
+      image: ubuntu-2004:current
+    resource_class: arm.medium
+    steps:
+      - run: uname -a
+      - run: echo "Hello, Arm!"
