@@ -1,7 +1,4 @@
 version: 2.1
-
-orbs:
-  docker: circleci/docker@2.2.0
   
 executors:
   amd64:
@@ -29,7 +26,6 @@ commands:
         type: string
     steps:
       - checkout
-      - docker/check
       - docker/build:
           image: ghcr.io/ragujp/misskey:latest
           tag: << parameters.arch >>-${CIRCLE_SHA1}
