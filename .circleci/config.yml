@@ -1,6 +1,8 @@
 version: 2.1
+
 orbs:
   docker: circleci/docker@2.0.2
+  
 executors:
   amd64:
     machine:
@@ -41,24 +43,24 @@ jobs:
     steps:
       - build:
           arch: arm64
- deploy:
-   steps:
+  deploy:
+    steps:
      - image: ghcr.io/ragujp/misskey:latest
        auth:
        username: ragujp
        password: $GITHUB_TOKEN
-   executor: amd64
+    executor: amd64
      - docker/check
      - run:
-         name: "Create manifest"
-         command: |
-           docker manifest create ragujp/misskey:latest \
-             --amend ragujp/misskey:current-${CIRCLE_SHA1} \
-             --amend ragujp/misskey:current-${CIRCLE_SHA1}
+        name: "Create manifest"
+        command: |
+          docker manifest create ragujp/misskey:latest \
+            --amend ragujp/misskey:current-${CIRCLE_SHA1} \
+            --amend ragujp/misskey:current-${CIRCLE_SHA1}
      - run:
-         name: "Push manifest"
-         command: |
-         docker manifest push ragujp/misskey:latest
+        name: "Push manifest"
+        command: |
+        docker manifest push ragujp/misskey:latest
 workflows:
   version: 2
   build_and_deploy:
