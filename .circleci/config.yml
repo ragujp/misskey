@@ -48,8 +48,8 @@ jobs:
     steps:
      - image: ghcr.io/ragujp/misskey:latest
        auth:
-       username: ragujp
-       password: $GITHUB_TOKEN
+         username: ragujp
+         password: $GITHUB_TOKEN
      - docker/check
      - run:
         name: "Create manifest"
