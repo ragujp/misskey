@@ -28,8 +28,6 @@ commands:
             if [ "$GITHUB_USERNAME$GITHUB_TOKEN" ]
              then
              sudo apt-get update && sudo apt-get -y install jq
-             ip=$(curl ifconfig.me)
-             echo $ip
              echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_USERNAME --password-stdin
              docker build -t ghcr.io/$GITHUB_USERNAME/misskey:latest .
              docker tag ghcr.io/$GITHUB_USERNAME/misskey:latest ghcr.io/$GITHUB_USERNAME/misskey:<< parameters.arch >>-${CIRCLE_SHA1}
@@ -54,6 +52,7 @@ jobs:
      - run:
         name: "Create manifest"
         command: |
+          echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_USERNAME --password-stdin
           docker manifest create ghcr.io/$GITHUB_USERNAME/misskey:latest \
             --amend ghcr.io/$GITHUB_USERNAME/misskey:amd64-${CIRCLE_SHA1} \
             --amend ghcr.io/$GITHUB_USERNAME/misskey:arm64-${CIRCLE_SHA1}
