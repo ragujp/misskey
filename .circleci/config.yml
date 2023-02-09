@@ -1,3 +1,4 @@
+version: 2.1
 jobs:
   my-test-job:
     machine:
