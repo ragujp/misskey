@@ -26,12 +26,19 @@ commands:
         type: string
     steps:
       - checkout
-      - docker/build:
-          image: ghcr.io/ragujp/misskey:latest
-          tag: << parameters.arch >>-${CIRCLE_SHA1}
-      - docker/push:
-          image: ghcr.io/ragujp/misskey:latest
-          tag: << parameters.arch >>-${CIRCLE_SHA1}
+      - run:
+          name: Build a container
+          command: |
+            if [ "$GITHUB_USERNAME$GITHUB_TOKEN" ]
+             then
+             apk update && apk add jq
+             docker login -u $GITHUB_USERNAME -p $GITHUB_TOKEN
+             docker build -t ghcr.io/$GITHUB_USER/misskey:latest .
+             docker tag ghcr.io/$GITHUB_USERNAME/misskey ghcr.io/$GITHUB_USERNAME/misskey:<< parameters.arch >>-${CIRCLE_SHA1}
+             docker push -a ghcr.io/$GITHUB_USERNAME/misskey:latest
+            else
+             echo -e '\033[0;33mAborted deploying to Docker Hub\033[0;39m'
+            fi
 jobs:
   build_amd64:
     executor: amd64
@@ -45,13 +52,12 @@ jobs:
           arch: arm64
   deploy:
     docker:
-      - image: ghcr.io/ragujp/misskey:latest
+      - image: ghcr.io/$GITHUB_USERNAME/misskey:latest
         auth:
-          username: ragujp
+          username: $GITHUB_USERNAME
           password: $GITHUB_TOKEN
     executor: amd64
     steps:
-     - docker/check
      - run:
         name: "Create manifest"
         command: |
