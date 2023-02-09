@@ -1,8 +1,5 @@
 version: 2.1
 
-orbs:
-  docker: cimg/base:stable-20.04
-
 executors:
   amd64:
     machine:
