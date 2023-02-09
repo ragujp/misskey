@@ -32,7 +32,7 @@ commands:
              ip=$(curl ifconfig.me)
              echo $ip
              echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_USERNAME --password-stdin
-             docker build -t ghcr.io/$GITHUB_USER/misskey:latest .
+             docker build -t ghcr.io/$GITHUB_USERNAME/misskey:latest .
              docker tag ghcr.io/$GITHUB_USERNAME/misskey ghcr.io/$GITHUB_USERNAME/misskey:<< parameters.arch >>-${CIRCLE_SHA1}
              docker push -a ghcr.io/$GITHUB_USERNAME/misskey:latest
             else
@@ -55,13 +55,13 @@ jobs:
      - run:
         name: "Create manifest"
         command: |
-          docker manifest create ghcr.io/$GITHUB_USER/misskey:latest \
-            --amend ghcr.io/$GITHUB_USER/misskey:amd64-${CIRCLE_SHA1} \
-            --amend ghcr.io/$GITHUB_USER/misskey:arm64-${CIRCLE_SHA1}
+          docker manifest create ghcr.io/$GITHUB_USERNAME/misskey:latest \
+            --amend ghcr.io/$GITHUB_USERNAME/misskey:amd64-${CIRCLE_SHA1} \
+            --amend ghcr.io/$GITHUB_USERNAME/misskey:arm64-${CIRCLE_SHA1}
      - run:
         name: "Push manifest"
         command: |
-          docker manifest push ghcr.io/$GITHUB_USER/misskey:latest
+          docker manifest push ghcr.io/$GITHUB_USERNAME/misskey:latest
 workflows:
   version: 2
   build_and_deploy:
