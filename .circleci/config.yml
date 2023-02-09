@@ -55,8 +55,8 @@ jobs:
         name: "Create manifest"
         command: |
           docker manifest create ragujp/misskey:latest \
-            --amend ragujp/misskey:current-${CIRCLE_SHA1} \
-            --amend ragujp/misskey:current-${CIRCLE_SHA1}
+            --amend ragujp/misskey:amd64-${CIRCLE_SHA1} \
+            --amend ragujp/misskey:arm64-${CIRCLE_SHA1}
      - run:
         name: "Push manifest"
         command: |
