@@ -127,10 +127,11 @@ hr {
 }
 
 .ti {
-	vertical-align: -10%;
-	line-height: 0.9em;
+	vertical-align: -14%;
+	line-height: 1em;
 
 	&:before {
+		display: inline-block;
 		font-size: 130%;
 	}
 }
@@ -152,6 +153,13 @@ hr {
 	user-select: none;
 	-webkit-user-select: none;
 	-webkit-touch-callout: none;
+}
+
+._nowrap {
+	white-space: pre !important;
+	word-wrap: normal !important; // https://codeday.me/jp/qa/20190424/690106.html
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 ._ghost {
