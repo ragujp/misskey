@@ -2,23 +2,17 @@ version: 2.1
   
 executors:
   amd64:
-    machine:
-      image: ubuntu-2004:latest
-      docker_layer_caching: true
     resource_class: medium
     environment:
       DOCKER_BUILDKIT: 1
     docker:
-      - image: docker:latest
+      - image: stable-20.04
   arm64:
-    machine:
-      image: ubuntu-2004:latest
-      docker_layer_caching: true
     resource_class: arm.medium
     environment:
       DOCKER_BUILDKIT: 1
     docker:
-      - image: docker:latest
+      - image: stable-20.04
 commands:
   build:
     parameters:
