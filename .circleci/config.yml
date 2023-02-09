@@ -1,7 +1,4 @@
 version: 2.1
-
-orbs:
-  docker: circleci/docker@2.0.2
   
 executors:
   amd64:
@@ -11,6 +8,8 @@ executors:
     resource_class: medium
     environment:
       DOCKER_BUILDKIT: 1
+    docker:
+      - image: docker:latest
   arm64:
     machine:
       image: ubuntu-2004:latest
@@ -18,6 +17,8 @@ executors:
     resource_class: arm.medium
     environment:
       DOCKER_BUILDKIT: 1
+    docker:
+      - image: docker:latest
 commands:
   build:
     parameters:
