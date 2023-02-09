@@ -1,9 +1,71 @@
 version: 2.1
-jobs:
-  my-test-job:
+orbs:
+  docker: circleci/docker@2.0.2
+executors:
+  amd64:
     machine:
-      image: ubuntu-2004:current
+      image: ubuntu-2004:latest
+      docker_layer_caching: true
+    resource_class: medium
+    environment:
+      DOCKER_BUILDKIT: 1
+  arm64:
+    machine:
+      image: ubuntu-2004:latest
+      docker_layer_caching: true
     resource_class: arm.medium
+    environment:
+      DOCKER_BUILDKIT: 1
+commands:
+  build:
+    parameters:
+      arch:
+        type: string
     steps:
-      - run: uname -a
-      - run: echo "Hello, Arm!"
+      - checkout
+      - docker/check
+      - docker/build:
+          image: ghcr.io/ragujp/misskey:latest
+          tag: << parameters.arch >>-${CIRCLE_SHA1}
+      - docker/push:
+          image: ghcr.io/ragujp/misskey:latest
+          tag: << parameters.arch >>-${CIRCLE_SHA1}
+jobs:
+  build_amd64:
+    executor: amd64
+    steps:
+      - build:
+          arch: amd64
+  build_arm64:
+    executor: arm64
+    steps:
+      - build:
+          arch: arm64
+ deploy:
+   steps:
+     - image: ghcr.io/ragujp/misskey:latest
+       auth:
+       username: ragujp
+       password: $GITHUB_TOKEN
+   executor: amd64
+     - docker/check
+     - run:
+         name: "Create manifest"
+         command: |
+           docker manifest create ragujp/misskey:latest \
+             --amend ragujp/misskey:current-${CIRCLE_SHA1} \
+             --amend ragujp/misskey:current-${CIRCLE_SHA1}
+     - run:
+         name: "Push manifest"
+         command: |
+         docker manifest push ragujp/misskey:latest
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build_amd64
+      - build_arm64
+      - deploy:
+          requires:
+            - build_amd64
+            - build_arm64
