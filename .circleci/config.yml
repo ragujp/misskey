@@ -64,6 +64,9 @@ jobs:
         name: "Push manifest (DockerHub)"
         command: |
           echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+          docker manifest create $DOCKERHUB_USERNAME/misskey:latest \
+            --amend ghcr.io/$GITHUB_USERNAME/misskey:amd64-${CIRCLE_SHA1} \
+            --amend ghcr.io/$GITHUB_USERNAME/misskey:arm64-${CIRCLE_SHA1}
           docker manifest push $DOCKERHUB_USERNAME/misskey:latest
 workflows:
   version: 2
