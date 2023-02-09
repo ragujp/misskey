@@ -10,7 +10,6 @@ jobs:
   push_to_registry:
     name: Push Docker image to GitHub Container Registry
     runs-on: ubuntu-latest
-    if: github.repository == 'misskey-dev/misskey'
     steps:
       - name: Add Buildx
         uses: docker/setup-buildx-action@v2
