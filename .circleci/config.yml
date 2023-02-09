@@ -1,5 +1,8 @@
 version: 2.1
-  
+
+orbs:
+  docker: cimg/base:stable-20.04
+
 executors:
   amd64:
     machine:
@@ -9,7 +12,7 @@ executors:
     environment:
       DOCKER_BUILDKIT: 1
     docker:
-      - image: stable-20.04
+      - image: cimg/base:stable-20.04
   arm64:
     machine:
       image: ubuntu-2004:latest
@@ -18,7 +21,7 @@ executors:
     environment:
       DOCKER_BUILDKIT: 1
     docker:
-      - image: stable-20.04
+      - image: cimg/base:stable-20.04
 commands:
   build:
     parameters:
