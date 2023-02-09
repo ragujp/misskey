@@ -45,11 +45,13 @@ jobs:
       - build:
           arch: arm64
   deploy:
+    docker:
+      - image: ghcr.io/ragujp/misskey:latest
+        auth:
+          username: ragujp
+          password: $GITHUB_TOKEN
+    executor: amd64
     steps:
-     - image: ghcr.io/ragujp/misskey:latest
-       auth:
-         username: ragujp
-         password: $GITHUB_TOKEN
      - docker/check
      - run:
         name: "Create manifest"
