@@ -8,8 +8,6 @@ executors:
     resource_class: medium
     environment:
       DOCKER_BUILDKIT: 1
-    docker:
-      - image: cimg/base:stable-20.04
   arm64:
     machine:
       image: ubuntu-2004:latest
@@ -17,8 +15,6 @@ executors:
     resource_class: arm.medium
     environment:
       DOCKER_BUILDKIT: 1
-    docker:
-      - image: cimg/base:stable-20.04
 commands:
   build:
     parameters:
