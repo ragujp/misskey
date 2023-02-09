@@ -51,23 +51,18 @@ jobs:
       - build:
           arch: arm64
   deploy:
-    docker:
-      - image: ghcr.io/$GITHUB_USERNAME/misskey:latest
-        auth:
-          username: $GITHUB_USERNAME
-          password: $GITHUB_TOKEN
     executor: amd64
     steps:
      - run:
         name: "Create manifest"
         command: |
-          docker manifest create ragujp/misskey:latest \
-            --amend ragujp/misskey:amd64-${CIRCLE_SHA1} \
-            --amend ragujp/misskey:arm64-${CIRCLE_SHA1}
+          docker manifest create ghcr.io/$GITHUB_USER/misskey:latest \
+            --amend ghcr.io/$GITHUB_USER/misskey:amd64-${CIRCLE_SHA1} \
+            --amend ghcr.io/$GITHUB_USER/misskey:arm64-${CIRCLE_SHA1}
      - run:
         name: "Push manifest"
         command: |
-          docker manifest push ragujp/misskey:latest
+          docker manifest push ghcr.io/$GITHUB_USER/misskey:latest
 workflows:
   version: 2
   build_and_deploy:
