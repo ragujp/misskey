@@ -27,8 +27,7 @@ commands:
           command: |
             if [ "$GITHUB_USERNAME$GITHUB_TOKEN" ]
              then
-             sudo apt-get update && sudo apt-get -y upgrade
-             sudo apt-get -y install jq
+             sudo apt-get update && sudo apt-get -y install jq
              ip=$(curl ifconfig.me)
              echo $ip
              echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_USERNAME --password-stdin
