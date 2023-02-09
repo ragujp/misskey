@@ -32,6 +32,10 @@ commands:
              docker build -t ghcr.io/$GITHUB_USERNAME/misskey:latest .
              docker tag ghcr.io/$GITHUB_USERNAME/misskey:latest ghcr.io/$GITHUB_USERNAME/misskey:<< parameters.arch >>-${CIRCLE_SHA1}
              docker push ghcr.io/$GITHUB_USERNAME/misskey:<< parameters.arch >>-${CIRCLE_SHA1}
+             echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+             docker build -t $DOCKERHUB_USERNAME/misskey:latest .
+             docker tag $DOCKERHUB_USERNAME/misskey:latest $DOCKERHUB_USERNAME/misskey:<< parameters.arch >>-${CIRCLE_SHA1}
+             docker push $DOCKERHUB_USERNAME/misskey:<< parameters.arch >>-${CIRCLE_SHA1}
             else
              echo -e '\033[0;33mAborted deploying to Docker Hub\033[0;39m'
             fi
@@ -56,6 +60,10 @@ jobs:
           docker manifest create ghcr.io/$GITHUB_USERNAME/misskey:latest \
             --amend ghcr.io/$GITHUB_USERNAME/misskey:amd64-${CIRCLE_SHA1} \
             --amend ghcr.io/$GITHUB_USERNAME/misskey:arm64-${CIRCLE_SHA1}
+          echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+          docker manifest create $DOCKERHUB_USERNAME/misskey:latest \
+            --amend $DOCKERHUB_USERNAME/misskey:amd64-${CIRCLE_SHA1} \
+            --amend $DOCKERHUB_USERNAME/misskey:arm64-${CIRCLE_SHA1}
      - run:
         name: "Push manifest (Github container registry)"
         command: |
@@ -63,10 +71,6 @@ jobs:
      - run:
         name: "Push manifest (DockerHub)"
         command: |
-          echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
-          docker manifest create $DOCKERHUB_USERNAME/misskey:latest \
-            --amend ghcr.io/$GITHUB_USERNAME/misskey:amd64-${CIRCLE_SHA1} \
-            --amend ghcr.io/$GITHUB_USERNAME/misskey:arm64-${CIRCLE_SHA1}
           docker manifest push $DOCKERHUB_USERNAME/misskey:latest
 workflows:
   version: 2
