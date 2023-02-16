@@ -3,7 +3,7 @@ name: Publish Docker image (develop)
 on:
   push:
     branches:
-      - develop
+      - brc-c
   workflow_dispatch:
 
 jobs:
