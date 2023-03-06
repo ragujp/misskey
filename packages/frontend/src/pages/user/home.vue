@@ -100,7 +100,7 @@
 					<XPhotos :key="user.id" :user="user"/>
 					<XActivity :key="user.id" :user="user"/>
 				</template>
-				<XNotes :class="$style.tl" :no-gap="true" :pagination="pagination"/>
+				<MkNotes :class="$style.tl" :no-gap="true" :pagination="pagination"/>
 			</div>
 		</div>
 		<div v-if="!narrow" class="sub _gaps" style="container-type: inline-size;">
@@ -130,7 +130,7 @@ import { i18n } from '@/i18n';
 import { $i } from '@/account';
 import { dateString } from '@/filters/date';
 import { confetti } from '@/scripts/confetti';
-import XNotes from '@/components/MkNotes.vue';
+import MkNotes from '@/components/MkNotes.vue';
 
 const XPhotos = defineAsyncComponent(() => import('./index.photos.vue'));
 const XActivity = defineAsyncComponent(() => import('./index.activity.vue'));
@@ -352,6 +352,9 @@ onUnmounted(() => {
 				> .roles {
 					padding: 24px 24px 0 154px;
 					font-size: 0.95em;
+					display: flex;
+					flex-wrap: wrap;
+					gap: 8px;
 
 					> .role {
 						border: solid 1px var(--color, var(--divider));
@@ -493,7 +496,7 @@ onUnmounted(() => {
 
 				> .roles {
 					padding: 16px 16px 0 16px;
-					text-align: center;
+					justify-content: center;
 				}
 
 				> .description {
