@@ -26,6 +26,7 @@ import { i18n } from '@/i18n';
 import { definePageMetadata } from '@/scripts/page-metadata';
 import { useRouter } from '@/router';
 import MkButton from '@/components/MkButton.vue';
+import { rolesCache } from '@/cache';
 
 const router = useRouter();
 
@@ -53,13 +54,16 @@ if (props.id) {
 		target: 'manual',
 		condFormula: { id: uuid(), type: 'isRemote' },
 		isPublic: false,
+		isExplorable: false,
 		asBadge: false,
 		canEditMembersByModerator: false,
+		displayOrder: 0,
 		policies: {},
 	};
 }
 
 async function save() {
+	rolesCache.delete();
 	if (role) {
 		os.apiWithDialog('admin/roles/update', {
 			roleId: role.id,

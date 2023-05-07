@@ -6,14 +6,14 @@ import { signup, post, uploadUrl, startServer, initTestDb, api, uploadFile } fro
 import type { INestApplicationContext } from '@nestjs/common';
 
 describe('Note', () => {
-	let p: INestApplicationContext;
+	let app: INestApplicationContext;
 	let Notes: any;
 
 	let alice: any;
 	let bob: any;
 
 	beforeAll(async () => {
-		p = await startServer();
+		app = await startServer();
 		const connection = await initTestDb(true);
 		Notes = connection.getRepository(Note);
 		alice = await signup({ username: 'alice' });
@@ -21,7 +21,7 @@ describe('Note', () => {
 	}, 1000 * 60 * 2);
 
 	afterAll(async () => {
-		await p.close();
+		await app.close();
 	});
 
 	test('投稿できる', async () => {
@@ -134,6 +134,31 @@ describe('Note', () => {
 		assert.strictEqual(res.body.createdNote.text, alicePost.text);
 		assert.strictEqual(res.body.createdNote.renoteId, alicePost.renoteId);
 		assert.strictEqual(res.body.createdNote.renote.text, bobPost.text);
+	});
+
+	test('visibility: followersでrenoteできる', async () => {
+		const createRes = await api('/notes/create', {
+			text: 'test',
+			visibility: 'followers',
+		}, alice);
+
+		assert.strictEqual(createRes.status, 200);
+
+		const renoteId = createRes.body.createdNote.id;
+		const renoteRes = await api('/notes/create', {
+			visibility: 'followers',
+			renoteId,
+		}, alice);
+
+		assert.strictEqual(renoteRes.status, 200);
+		assert.strictEqual(renoteRes.body.createdNote.renoteId, renoteId);
+		assert.strictEqual(renoteRes.body.createdNote.visibility, 'followers');
+
+		const deleteRes = await api('/notes/delete', {
+			noteId: renoteRes.body.createdNote.id,
+		}, alice);
+
+		assert.strictEqual(deleteRes.status, 204);
 	});
 
 	test('文字数ぎりぎりで怒られない', async () => {
@@ -326,6 +351,72 @@ describe('Note', () => {
 			assert.notEqual(myNote, null);
 			assert.strictEqual(myNote.renote.reply.files.length, 1);
 			assert.strictEqual(myNote.renote.reply.files[0].id, file.body.id);
+		});
+
+		test('NSFWが強制されている場合変更できない', async () => {
+			const file = await uploadFile(alice);
+
+			const res = await api('admin/roles/create', {
+				name: 'test',
+				description: '',
+				color: null,
+				iconUrl: null,
+				displayOrder: 0,
+				target: 'manual',
+				condFormula: {},
+				isAdministrator: false,
+				isModerator: false,
+				isPublic: false,
+				isExplorable: false,
+				asBadge: false,
+				canEditMembersByModerator: false,
+				policies: {
+					alwaysMarkNsfw: {
+						useDefault: false,
+						priority: 0,
+						value: true,
+					},
+				},
+			}, alice);
+			
+			assert.strictEqual(res.status, 200);
+
+			const assign = await api('admin/roles/assign', {
+				userId: alice.id,
+				roleId: res.body.id,
+			}, alice);
+
+			assert.strictEqual(assign.status, 204);
+			assert.strictEqual(file.body.isSensitive, false);
+
+			const nsfwfile = await uploadFile(alice);
+
+			assert.strictEqual(nsfwfile.status, 200);
+			assert.strictEqual(nsfwfile.body.isSensitive, true);
+
+			const liftnsfw = await api('drive/files/update', {
+				fileId: nsfwfile.body.id,
+				isSensitive: false,
+			}, alice);
+
+			assert.strictEqual(liftnsfw.status, 400);
+			assert.strictEqual(liftnsfw.body.error.code, 'RESTRICTED_BY_ROLE');
+
+			const oldaddnsfw = await api('drive/files/update', {
+				fileId: file.body.id,
+				isSensitive: true,
+			}, alice);
+
+			assert.strictEqual(oldaddnsfw.status, 200);
+
+			await api('admin/roles/unassign', {
+				userId: alice.id,
+				roleId: res.body.id,
+			});
+
+			await api('admin/roles/delete', {
+				roleId: res.body.id,
+			}, alice);
 		});
 	});
 
