@@ -6,7 +6,7 @@
 			<span class="title">
 				<slot name="header"></slot>
 			</span>
-			<button v-if="!withOkButton" class="_button" @click="$emit('close')"><i class="ti ti-x"></i></button>
+			<button v-if="!withOkButton" class="_button" data-cy-modal-window-close @click="$emit('close')"><i class="ti ti-x"></i></button>
 			<button v-if="withOkButton" class="_button" :disabled="okButtonDisabled" @click="$emit('ok')"><i class="ti ti-check"></i></button>
 		</div>
 		<div class="body">
@@ -89,7 +89,6 @@ defineExpose({
 	display: flex;
 	flex-direction: column;
 	contain: content;
-	container-type: inline-size;
 	border-radius: var(--radius);
 
 	--root-margin: 24px;
@@ -142,6 +141,7 @@ defineExpose({
 		flex: 1;
 		overflow: auto;
 		background: var(--panel);
+		container-type: size;
 	}
 }
 </style>
