@@ -3,14 +3,14 @@ version: 2.1
 executors:
   amd64:
     machine:
-      image: ubuntu-2004:2022.10.1
+      image: ubuntu-2004:2023.04.2
       docker_layer_caching: true
     resource_class: medium
     environment:
       DOCKER_BUILDKIT: 1
   arm64:
     machine:
-      image: ubuntu-2004:2022.10.1
+      image: ubuntu-2004:2023.04.2
       docker_layer_caching: true
     resource_class: arm.medium
     environment:
