@@ -27,6 +27,7 @@ commands:
           command: |
             if [ "$GITHUB_USERNAME$GITHUB_TOKEN" ]
              then
+             curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
              sudo apt-get update && sudo apt-get -y install jq
              echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_USERNAME --password-stdin
              docker build -t ghcr.io/$GITHUB_USERNAME/misskey:latest .
