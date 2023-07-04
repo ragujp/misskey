@@ -3,7 +3,9 @@ name: Publish Docker image (develop)
 on:
   push:
     branches:
-      - develop
+      - '*'
+    tags:
+      - '*'
   workflow_dispatch:
 
 jobs:
