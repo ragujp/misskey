@@ -14,14 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Add Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       - name: Add qemu 
         uses: docker/setup-qemu-action@v2
       - name: Check out the repo
         uses: actions/checkout@v4.1.0
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v3.0.0
+        uses: docker/setup-buildx-action@v3
         with:
           platforms: linux/amd64,linux/arm64
       - name: Docker meta
