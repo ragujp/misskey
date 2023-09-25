@@ -14,7 +14,7 @@ jobs:
       - name: Add Buildx
         uses: docker/setup-buildx-action@v2
       - name: Add qemu 
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       - name: Check out the repo
         uses: actions/checkout@v4.1.0
       - name: Set up Docker Buildx
