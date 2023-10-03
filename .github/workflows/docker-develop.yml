@@ -3,7 +3,7 @@ name: Publish Docker image (develop)
 on:
   push:
     branches:
-      - develop
+      - '*'
   workflow_dispatch:
 
 jobs:
@@ -37,7 +37,7 @@ jobs:
           push: true
           platforms: ${{ steps.buildx.outputs.platforms }}
           provenance: false
-          tags: ${{ secrets.DOCKER_USERNAME }}/misskey:develop
+          tags: ${{ secrets.DOCKER_USERNAME }}/misskey:${{ github.ref_name }}
           labels: develop
           cache-from: type=gha
           cache-to: type=gha,mode=max
