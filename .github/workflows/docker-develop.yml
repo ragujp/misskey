@@ -10,7 +10,7 @@ jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
-    if: github.repository == 'misskey-dev/misskey'
+    if: github.repository == ragujp/misskey
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4.1.0
@@ -23,7 +23,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: misskey/misskey
+          images: ${{ secrets.DOCKER_USERNAME }}/misskey
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -37,7 +37,30 @@ jobs:
           push: true
           platforms: ${{ steps.buildx.outputs.platforms }}
           provenance: false
-          tags: misskey/misskey:develop
+          tags: ${{ secrets.DOCKER_USERNAME }}/misskey:develop
           labels: develop
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      #Github container registry
+      - name: Docker meta
+        id: meta_github_cr
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and Push to GitHub Container Registry
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          builder: ${{ steps.buildx.outputs.name }}
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: ghcr.io/${{ github.repository_owner }}/misskey:${{ github.ref_name }}
+          labels: develop
