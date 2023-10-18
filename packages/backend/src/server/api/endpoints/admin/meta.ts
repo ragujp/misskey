@@ -105,6 +105,16 @@ export const meta = {
 				type: 'boolean',
 				optional: false, nullable: false,
 			},
+			silencedHosts: {
+				type: "array",
+				optional: true,
+				nullable: false,
+				items: {
+					type: "string",
+					optional: false,
+					nullable: false,
+				},
+			},
 			pinnedUsers: {
 				type: 'array',
 				optional: false, nullable: false,
@@ -297,6 +307,10 @@ export const meta = {
 				type: 'number',
 				optional: false, nullable: false,
 			},
+			notesPerOneAd: {
+				type: 'number',
+				optional: false, nullable: false,
+			},
 		},
 	},
 } as const;
@@ -363,6 +377,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				pinnedUsers: instance.pinnedUsers,
 				hiddenTags: instance.hiddenTags,
 				blockedHosts: instance.blockedHosts,
+				silencedHosts: instance.silencedHosts,
 				sensitiveWords: instance.sensitiveWords,
 				preservedUsernames: instance.preservedUsernames,
 				hcaptchaSecretKey: instance.hcaptchaSecretKey,
@@ -408,6 +423,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				perRemoteUserUserTimelineCacheMax: instance.perRemoteUserUserTimelineCacheMax,
 				perUserHomeTimelineCacheMax: instance.perUserHomeTimelineCacheMax,
 				perUserListTimelineCacheMax: instance.perUserListTimelineCacheMax,
+				notesPerOneAd: instance.notesPerOneAd,
 			};
 		});
 	}

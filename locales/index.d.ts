@@ -198,6 +198,7 @@ export interface Locale {
     "perDay": string;
     "stopActivityDelivery": string;
     "blockThisInstance": string;
+    "silenceThisInstance": string;
     "operations": string;
     "software": string;
     "version": string;
@@ -217,6 +218,8 @@ export interface Locale {
     "clearCachedFilesConfirm": string;
     "blockedInstances": string;
     "blockedInstancesDescription": string;
+    "silencedInstances": string;
+    "silencedInstancesDescription": string;
     "muteAndBlock": string;
     "mutedUsers": string;
     "blockedUsers": string;
@@ -534,6 +537,7 @@ export interface Locale {
     "deleteAll": string;
     "showFixedPostForm": string;
     "showFixedPostFormInChannel": string;
+    "withRepliesByDefaultForNewlyFollowed": string;
     "newNoteRecived": string;
     "sounds": string;
     "sound": string;
@@ -1627,6 +1631,10 @@ export interface Locale {
         "reduceFrequencyOfThisAd": string;
         "hide": string;
         "timezoneinfo": string;
+        "adsSettings": string;
+        "notesPerOneAd": string;
+        "setZeroToDisable": string;
+        "adsTooClose": string;
     };
     "_forgotPassword": {
         "enterEmail": string;
@@ -1792,9 +1800,6 @@ export interface Locale {
             "infoFg": string;
             "infoWarnBg": string;
             "infoWarnFg": string;
-            "cwBg": string;
-            "cwFg": string;
-            "cwHoverBg": string;
             "toastBg": string;
             "toastFg": string;
             "buttonBg": string;
@@ -2050,6 +2055,7 @@ export interface Locale {
         "userLists": string;
         "excludeMutingUsers": string;
         "excludeInactiveUsers": string;
+        "withReplies": string;
     };
     "_charts": {
         "federation": string;
@@ -2289,6 +2295,15 @@ export interface Locale {
         "createAd": string;
         "deleteAd": string;
         "updateAd": string;
+    };
+    "_fileViewer": {
+        "title": string;
+        "type": string;
+        "size": string;
+        "url": string;
+        "uploadedAt": string;
+        "attachedNotes": string;
+        "thisPageCanBeSeenFromTheAuthor": string;
     };
 }
 declare const locales: {

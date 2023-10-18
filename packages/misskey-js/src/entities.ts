@@ -278,6 +278,9 @@ export type Notification = {
 	user: User;
 	userId: User['id'];
 } | {
+	type: 'achievementEarned';
+	achievement: string;
+} | {
 	type: 'app';
 	header?: string | null;
 	body: string;
@@ -362,6 +365,7 @@ export type LiteInstanceMetadata = {
 		url: string;
 		imageUrl: string;
 	}[];
+	notesPerOneAd: number;
 	translatorAvailable: boolean;
 	serverRules: string[];
 };
@@ -381,6 +385,7 @@ export type InstanceMetadata = LiteInstanceMetadata | DetailedInstanceMetadata;
 export type AdminInstanceMetadata = DetailedInstanceMetadata & {
 	// TODO: There are more fields.
 	blockedHosts: string[];
+	silencedHosts: string[];
 	app192IconUrl: string | null;
 	app512IconUrl: string | null;
 	manifestJsonOverride: string;
@@ -466,6 +471,7 @@ export type Antenna = {
 	userGroupId: ID | null; // TODO
 	users: string[]; // TODO
 	caseSensitive: boolean;
+	localOnly: boolean;
 	notify: boolean;
 	withReplies: boolean;
 	withFile: boolean;
@@ -540,6 +546,7 @@ export type Instance = {
 	lastCommunicatedAt: DateString;
 	isNotResponding: boolean;
 	isSuspended: boolean;
+	isSilenced: boolean;
 	isBlocked: boolean;
 	softwareName: string | null;
 	softwareVersion: string | null;

@@ -77,6 +77,11 @@ export class MiMeta {
 	public sensitiveWords: string[];
 
 	@Column('varchar', {
+		length: 1024, array: true, default: '{}',
+	})
+	public silencedHosts: string[];
+
+	@Column('varchar', {
 		length: 1024,
 		nullable: true,
 	})
@@ -503,4 +508,9 @@ export class MiMeta {
 		default: 300,
 	})
 	public perUserListTimelineCacheMax: number;
+
+	@Column('integer', {
+		default: 0,
+	})
+	public notesPerOneAd: number;
 }
