@@ -16,13 +16,17 @@
 
 ### General
 - Enhance: ローカリゼーションの更新
+- Fix: 自分のdirect noteがuser list timelineに追加されない
 
 ### Client
-- 
+- Fix: 一部のモデログ(logYellowでの表示対象)について、表示の色が変わらない問題を修正
+- Feat: AiScript専用のMFM構文`$[clickable.ev=EVENTNAME ...]`を追加。`Mk:C:mfm`のオプション`onClickEv`に関数を渡すと、クリック時に`EVENTNAME`を引数にして呼び出す
 
 ### Server
 - Enhance: センシティブワードの設定がハッシュタグトレンドにも適用されるようになりました
 - Fix: 1702718871541-ffVisibility.jsのdownが壊れている
+- Fix:「非センシティブのみ（リモートはいいねのみ）」を設定していても、センシティブに設定されたカスタム絵文字をリアクションできる問題を修正
+- Fix: ロールアサイン時の通知で，ロールアイコンが縮小されずに表示される問題を修正
 
 ## 2023.12.0
 
