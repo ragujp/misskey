@@ -22,7 +22,7 @@ jobs:
         platform:
           - linux/amd64
           - linux/arm64
-    if: github.repository == 'misskey-dev/misskey'
+    if: github.repository == 'ragujp/misskey'
     steps:
       - name: Prepare
         run: |
