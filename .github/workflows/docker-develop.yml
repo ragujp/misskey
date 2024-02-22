@@ -132,7 +132,7 @@
               username: ${{ github.actor }}
               password: ${{ secrets.GITHUB_TOKEN }}
         - name: Create manifest list and push
-          working-directory: /tmp/digests
+          working-directory: /tmp/ghcr-digests
           run: |
             docker buildx imagetools create --tag ${{ env.REGISTRY_IMAGE_GH }}:develop \
               $(printf '${{ env.REGISTRY_IMAGE_GH }}@sha256:%s ' *)
