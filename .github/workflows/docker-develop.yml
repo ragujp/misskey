@@ -1,125 +1,141 @@
-name: Publish Docker image (develop)
+  name: Publish Docker image (develop)
 
-on:
-  push:
-    branches:
-      - '*'
-    tags:
-      - '*'
-  workflow_dispatch:
+  on:
+    push:
+      branches:
+        - '*'
+      tags:
+        - '*'
+    workflow_dispatch:
 
-env:
-  REGISTRY_IMAGE: ragujp/misskey
+  env:
+    REGISTRY_IMAGE: raguchan/misskey
+    REGISTRY_IMAGE_GH: ghcr.io/ragujp/misskey
 
-jobs:
-  # see https://docs.docker.com/build/ci/github-actions/multi-platform/#distribute-build-across-multiple-runners
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-          - linux/amd64
-          - linux/arm64
-    if: github.repository == 'ragujp/misskey'
-    steps:
-      - name: Prepare
-        run: |
-          platform=${{ matrix.platform }}
-          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
-      - name: Add Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Add qemu
-        uses: docker/setup-qemu-action@v2
-      - name: Check out the repo
-        uses: actions/checkout@v4.1.1
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v3.0.0
-        with:
-          platforms: linux/amd64,linux/arm64
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and Push to GitHub Container Registry
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          builder: ${{ steps.buildx.outputs.name }}
-          push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          tags: ghcr.io/${{ github.repository_owner }}/misskey:latest
-          labels: develop
-# DockerHub
-      - name: Docker meta
-        id: meta_dhub
-        uses: docker/metadata-action@v4
-        with:
-          images: raguchan/misskey
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build and push by digest
-        id: build
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          platforms: ${{ matrix.platform }}
-          provenance: false
-          labels: develop
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
-      - name: Export digest
-        run: |
-          mkdir -p /tmp/digests
-          digest="${{ steps.build.outputs.digest }}"
-          touch "/tmp/digests/${digest#sha256:}"
-      - name: Upload digest
-        uses: actions/upload-artifact@v4
-        with:
-          name: digests-${{ env.PLATFORM_PAIR }}
-          path: /tmp/digests/*
-          if-no-files-found: error
-          retention-days: 1
+  jobs:
+    # see https://docs.docker.com/build/ci/github-actions/multi-platform/#distribute-build-across-multiple-runners
+    build:
+      name: Build
+      runs-on: ubuntu-latest
+      strategy:
+        fail-fast: false
+        matrix:
+          platform:
+            - linux/amd64
+            - linux/arm64
+      if: github.repository == 'ragujp/misskey'
+      steps:
+        - name: Prepare
+          run: |
+            platform=${{ matrix.platform }}
+            echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
+        - name: Check out the repo
+          uses: actions/checkout@v4.1.1
+        - name: Set up Docker Buildx
+          uses: docker/setup-buildx-action@v3
+        - name: Log in to Docker Hub
+          uses: docker/login-action@v3
+          with:
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_PASSWORD }}
+        - name: Build and push by digest
+          id: build
+          uses: docker/build-push-action@v5
+          with:
+            context: .
+            push: true
+            platforms: ${{ matrix.platform }}
+            provenance: false
+            labels: develop
+            cache-from: type=gha
+            cache-to: type=gha,mode=max
+            outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
+        - name: Export digest
+          run: |
+            mkdir -p /tmp/digests
+            digest="${{ steps.build.outputs.digest }}"
+            touch "/tmp/digests/${digest#sha256:}"
+        - name: Upload digest
+          uses: actions/upload-artifact@v4
+          with:
+            name: digests-${{ env.PLATFORM_PAIR }}
+            path: /tmp/digests/*
+            if-no-files-found: error
+            retention-days: 1
+        - name: Log in to GHCR
+          uses: docker/login-action@v3
+          with:
+            registry: ghcr.io
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+        - name: Build and push by digest to GHCR
+          id: build-ghcr
+          uses: docker/build-push-action@v5
+          with:
+            context: .
+            push: true
+            platforms: ${{ matrix.platform }}
+            provenance: false
+            labels: develop
+            cache-from: type=gha
+            cache-to: type=gha,mode=max
+            outputs: type=image,name=${{ env.REGISTRY_IMAGE_GH }},push-by-digest=true,name-canonical=true,push=true
+        - name: Export digest for GHCR
+          run: |
+            mkdir -p /tmp/ghcr-digests
+            digest="${{ steps.build-ghcr.outputs.digest }}"
+            touch "/tmp/ghcr-digests/${digest#sha256:}"
+        - name: Upload digest for GHCR
+          uses: actions/upload-artifact@v4
+          with:
+            name: ghcr-digests-${{ env.PLATFORM_PAIR }}
+            path: /tmp/ghcr-digests/*
+            if-no-files-found: error
+            retention-days: 1
 
-  merge:
-    runs-on: ubuntu-latest
-    needs:
-      - build
-    steps:
-      - name: Download digests
-        uses: actions/download-artifact@v4
-        with:
-          path: /tmp/digests
-          pattern: digests-*
-          merge-multiple: true
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Create manifest list and push
-        working-directory: /tmp/digests
-        run: |
-          docker buildx imagetools create --tag ${{ env.REGISTRY_IMAGE }}:develop \
-            $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)
-      - name: Inspect image
-        run: |
-          docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:develop
+    merge:
+      runs-on: ubuntu-latest
+      needs:
+        - build
+      steps:
+        - name: Download digests
+          uses: actions/download-artifact@v4
+          with:
+            path: /tmp/digests
+            pattern: digests-*
+            merge-multiple: true
+        - name: Download digests for GHCR
+          uses: actions/download-artifact@v4
+          with:
+            path: /tmp/ghcr-digests
+            pattern: ghcr-*
+            merge-multiple: true
+        - name: Set up Docker Buildx
+          uses: docker/setup-buildx-action@v3
+        - name: Login to Docker Hub
+          uses: docker/login-action@v3
+          with:
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_PASSWORD }}
+        - name: Create manifest list and push
+          working-directory: /tmp/digests
+          run: |
+            docker buildx imagetools create --tag ${{ env.REGISTRY_IMAGE }}:develop \
+              $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)
+        - name: Inspect image for GHCR
+          run: |
+            docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE_GH }}:develop
+            - name: Login to Docker Hub
+            uses: docker/login-action@v3
+            with:
+              registry: ghcr.io
+              username: ${{ github.actor }}
+              password: ${{ secrets.GITHUB_TOKEN }}
+        - name: Create manifest list and push
+          working-directory: /tmp/digests
+          run: |
+            docker buildx imagetools create --tag ${{ env.REGISTRY_IMAGE_GH }}:develop \
+              $(printf '${{ env.REGISTRY_IMAGE_GH }}@sha256:%s ' *)
+        - name: Inspect image
+          run: |
+            docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE_GH }}:develop
