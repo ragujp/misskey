@@ -40,7 +40,7 @@
             password: ${{ secrets.DOCKER_PASSWORD }}
         - name: Build and push by digest
           id: build
-          uses: docker/build-push-action@v5
+          uses: docker/build-push-action@v6
           with:
             context: .
             push: true
@@ -70,7 +70,7 @@
             password: ${{ secrets.GITHUB_TOKEN }}
         - name: Build and push by digest to GHCR
           id: build-ghcr
-          uses: docker/build-push-action@v5
+          uses: docker/build-push-action@v6
           with:
             context: .
             push: true
